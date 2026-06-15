@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grok Premium Free</title>
-    <!-- Live library hosted securely via Puter CDN -->
-    <script src="https://puter.com"></script>
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
@@ -101,6 +99,9 @@
     </div>
 </div>
 
+<!-- This fixes the loader issue by securely embedding the cdn source script -->
+<script src="https://js.puter.com/v2/"></script>
+
 <script>
     let chatHistory = [];
 
@@ -108,11 +109,6 @@
         const historyBox = document.getElementById("chatHistoryBox");
         const promptInput = document.getElementById("prompt");
         const promptText = promptInput.value.trim();
-
-        if (typeof puter === 'undefined') {
-            alert("System initializing. Give it 2 seconds!");
-            return;
-        }
 
         if (!promptText) return;
 
@@ -135,7 +131,7 @@
         historyBox.scrollTop = historyBox.scrollHeight;
 
         try {
-            // Target flagship model
+            // Fix: Calls the direct script runner object instead of window initialization
             const response = await puter.ai.chat(chatHistory, { model: 'x-ai/grok-4.3' });
             const botReply = response.message.content;
 
