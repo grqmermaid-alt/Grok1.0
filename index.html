@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grok Premium Free</title>
+    <!-- Live library hosted securely via Puter CDN -->
+    <script src="https://puter.com"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: #0f1419; 
+            color: #fff; 
+            margin: 0; 
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .chat-container { 
+            width: 100vw; 
+            max-width: 600px; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            background: #15181c;
+        }
+        .chat-header {
+            background: #0f1419;
+            padding: 15px;
+            text-align: center;
+            font-weight: 800;
+            color: #1d9bf0;
+            border-bottom: 1px solid #2f3336;
+        }
+        .chat-history { 
+            flex: 1; 
+            padding: 15px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px;
+        }
+        .msg-user { 
+            align-self: flex-end; 
+            background: #1d9bf0; 
+            color: white; 
+            padding: 10px 14px; 
+            border-radius: 18px 18px 4px 18px; 
+            max-width: 75%; 
+            word-wrap: break-word;
+        }
+        .msg-bot { 
+            align-self: flex-start; 
+            background: #2f3336; 
+            color: #eff3f4; 
+            padding: 10px 14px; 
+            border-radius: 18px 18px 18px 4px; 
+            max-width: 75%; 
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        .input-area { 
+            display: flex; 
+            padding: 12px; 
+            background: #0f1419; 
+            border-top: 1px solid #2f3336; 
+            gap: 8px;
+        }
+        textarea { 
+            flex: 1; 
+            height: 45px; 
+            padding: 12px; 
+            background: #15181c; 
+            color: #fff; 
+            border: 1px solid #2f3336; 
+            border-radius: 20px; 
+            box-sizing: border-box; 
+            font-size: 15px; 
+            resize: none; 
+        }
+        textarea:focus { outline: none; border-color: #1d9bf0; }
+        button { 
+            background: #1d9bf0; 
+            border: none; 
+            color: white; 
+            font-weight: bold; 
+            border-radius: 20px; 
+            padding: 0 20px;
+            font-size: 15px; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">Grok Premium Free</div>
+    <div id="chatHistoryBox" class="chat-history"></div>
+    <div class="input-area">
+        <textarea id="prompt" placeholder="Type a message..."></textarea>
+        <button id="sendBtn">Send</button>
+    </div>
+</div>
+
+<script>
+    let chatHistory = [];
+
+    document.getElementById('sendBtn').addEventListener('click', async () => {
+        const historyBox = document.getElementById("chatHistoryBox");
+        const promptInput = document.getElementById("prompt");
+        const promptText = promptInput.value.trim();
+
+        if (typeof puter === 'undefined') {
+            alert("System initializing. Give it 2 seconds!");
+            return;
+        }
+
+        if (!promptText) return;
+
+        // Render user message bubble
+        const userDiv = document.createElement('div');
+        userDiv.className = 'msg-user';
+        userDiv.innerText = promptText;
+        historyBox.appendChild(userDiv);
+        
+        promptInput.value = "";
+        historyBox.scrollTop = historyBox.scrollHeight;
+
+        chatHistory.push({ role: "user", content: promptText });
+
+        // Render placeholder bot bubble
+        const botDiv = document.createElement('div');
+        botDiv.className = 'msg-bot';
+        botDiv.innerText = "Thinking...";
+        historyBox.appendChild(botDiv);
+        historyBox.scrollTop = historyBox.scrollHeight;
+
+        try {
+            // Target flagship model
+            const response = await puter.ai.chat(chatHistory, { model: 'x-ai/grok-4.3' });
+            const botReply = response.message.content;
+
+            botDiv.innerText = botReply;
+            chatHistory.push({ role: "assistant", content: botReply });
+            historyBox.scrollTop = historyBox.scrollHeight;
+
+        } catch (err) {
+            botDiv.innerText = "Error: " + err.message;
+            chatHistory.pop();
+        }
+    });
+</script>
+
+</body>
+</html>
